@@ -17,8 +17,9 @@
  *                    增加web配网以及串口设置天气更新时间的功能。
  *             V1.3.4 修改web配网页面设置，将wifi设置页面以及其余设置选项放入同一页面中。
  *                    增加web页面设置是否使用DHT传感器。（使能DHT后才可使用）
- *             1.4.2  增加长按SD3 Plus底部按钮重置WiFi
+ *             v1.4.2 增加长按SD3 Plus底部按钮重置WiFi
  *                    基本汉化网页配置页面
+ *
  *
  * 引 脚 分 配：SCK   GPIO14
  *             MOSI  GPIO13
@@ -110,10 +111,10 @@ Thread reflash_Banner = Thread();
 //创建恢复WIFI链接
 Thread reflash_openWifi = Thread();
 //创建动画绘制线程
-// Thread reflash_Animate = Thread();
+Thread reflash_Animate = Thread();
 
 //创建协程池
-StaticThreadController<3> controller(&reflash_time, &reflash_Banner, &reflash_openWifi);
+StaticThreadController<4> controller(&reflash_time, &reflash_Banner, &reflash_openWifi, &reflash_Animate);
 
 //联网后所有需要更新的数据
 Thread WIFI_reflash = Thread();
@@ -1340,8 +1341,8 @@ void setup()
   reflash_openWifi.setInterval(updateweater_time * 60 * TMS); //设置所需间隔 10分钟
   reflash_openWifi.onRun(openWifi);
 
-  // reflash_Animate.setInterval(TMS / 30); //设置帧率
-  // reflash_openWifi.onRun(refresh_AnimatedImage,&TJpgDec);
+  reflash_Animate.setInterval(TMS / 10); //设置帧率
+  reflash_openWifi.onRun(refresh_AnimatedImage);
 
   controller.run();
 }
