@@ -5,21 +5,21 @@
 #if Animate_Choice == 1
 #include "img/pangzi.h"
 
-int Animate_key = 0; //Í¼±êÏÔÊ¾Ö¸Õë¼ÇÂ¼
+int Animate_key = 0; //å›¾æ ‡æ˜¾ç¤ºæŒ‡é’ˆè®°å½•
 
 #elif Animate_Choice == 2
 #include "img/hutao.h"
 
-int Animate_key = 0; //Í¼±êÏÔÊ¾Ö¸Õë¼ÇÂ¼
+int Animate_key = 0; //å›¾æ ‡æ˜¾ç¤ºæŒ‡é’ˆè®°å½•
 #endif
 
 #if Animate_Choice == 1
-//Ì«¿ÕÈËÆğ·É
+//å¤ªç©ºäººèµ·é£
 void imgAnim(TJpg_Decoder *in_TJpgDec)
 {
     TJpgDec = *in_TJpgDec;
     int x = 160, y = 160;
-    if (millis() - AprevTime > 41) // x msÇĞ»»Ò»´Î
+    if (millis() - AprevTime > 41) // x msåˆ‡æ¢ä¸€æ¬¡
     {
         Animate_key++;
         AprevTime = millis();
@@ -59,17 +59,17 @@ void imgAnim(TJpg_Decoder *in_TJpgDec)
         TJpgDec.drawJpg(x, y, i9, sizeof(i9));
         break;
     default:
-        Serial.println("ÏÔÊ¾Anim´íÎó");
+        Serial.println("æ˜¾ç¤ºAnimé”™è¯¯");
         break;
     }
 }
 #elif Animate_Choice == 2
-//ºúÌÒÒ¡
+//èƒ¡æ¡ƒæ‘‡
 // void imgAnim(TJpg_Decoder *in_TJpgDec)
 // {
 //     TJpgDec = *in_TJpgDec;
 //     int x = 160, y = 160;
-//     if (millis() - AprevTime > 33) // x msÇĞ»»Ò»´Î
+//     if (millis() - AprevTime > 33) // x msåˆ‡æ¢ä¸€æ¬¡
 //     {
 //         Anim++;
 //         AprevTime = millis();
@@ -95,7 +95,7 @@ void imgAnim(const uint8_t **Animate_value, uint32_t *Animate_size)
 }
 #endif
 
-//¸üĞÂÓÒÏÂ½Ç
+//æ›´æ–°å³ä¸‹è§’
 // void refresh_AnimatedImage(TJpg_Decoder *TJpgDec)
 // {
 // #if Animate_Choice

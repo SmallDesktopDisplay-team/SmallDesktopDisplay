@@ -1,5 +1,3 @@
-
-
 /* *****************************************************************
  *
  * SmallDesktopDisplay
@@ -11,18 +9,18 @@
  * 讨  论  群：811058758、887171863、720661626
  * 创 建 日 期：2021.07.19
  * 最后更改日期：2021.11.28
- * 更 改 说 明：V1.1添加串口调试，波特率115200\8\n\1；增加版本号显示。
- *            V1.2亮度和城市代码保存到EEPROM，断电可保存
- *            V1.3.1 更改smartconfig改为WEB配网模式，同时在配网的同时增加亮度、屏幕方向设置。
- *            V1.3.2 增加wifi休眠模式，仅在需要连接的情况下开启wifi，其他时间关闭wifi。增加wifi保存至eeprom（目前仅保存一组ssid和密码）
- *            V1.3.3  修改WiFi保存后无法删除的问题。目前更改为使用串口控制，输入 0x05 重置WiFi数据并重启。
+ * 更 改 说 明：V1.1   添加串口调试，波特率115200\8\n\1；增加版本号显示。
+ *             V1.2   亮度和城市代码保存到EEPROM，断电可保存
+ *             V1.3.1 更改smartconfig改为WEB配网模式，同时在配网的同时增加亮度、屏幕方向设置。
+ *             V1.3.2 增加wifi休眠模式，仅在需要连接的情况下开启wifi，其他时间关闭wifi。增加wifi保存至eeprom（目前仅保存一组ssid和密码）
+ *             V1.3.3 修改WiFi保存后无法删除的问题。目前更改为使用串口控制，输入 0x05 重置WiFi数据并重启。
  *                    增加web配网以及串口设置天气更新时间的功能。
- *            V1.3.4  修改web配网页面设置，将wifi设置页面以及其余设置选项放入同一页面中。
+ *             V1.3.4 修改web配网页面设置，将wifi设置页面以及其余设置选项放入同一页面中。
  *                    增加web页面设置是否使用DHT传感器。（使能DHT后才可使用）
  *             1.4.2  增加长按SD3 Plus底部按钮重置WiFi
  *                    基本汉化网页配置页面
  *
- * 引 脚 分 配： SCK  GPIO14
+ * 引 脚 分 配：SCK   GPIO14
  *             MOSI  GPIO13
  *             RES   GPIO2
  *             DC    GPIO0
@@ -719,16 +717,16 @@ void saveParamCallback()
     EEPROM.commit();
     delay(5);
   }
-  //屏幕亮度
+  // 屏幕亮度
   Serial.printf("亮度调整为：");
   analogWrite(LCD_BL_PIN, 1023 - (LCD_BL_PWM * 10));
   Serial.println(LCD_BL_PWM);
-  //天气更新时间
+  // 天气更新时间
   Serial.printf("天气更新时间调整为：");
   Serial.println(updateweater_time);
 
 #if DHT_EN
-  //是否使用DHT11传感器
+  // 是否使用DHT11传感器
   Serial.printf("DHT11传感器：");
   EEPROM.write(DHT_addr, DHT_img_flag);
   EEPROM.commit(); //保存更改的数据
@@ -842,10 +840,10 @@ void getCityWeater()
 String scrollText[7];
 // int scrollTextWidth = 0;
 
-//天气信息写到屏幕上
+// 天气信息写到屏幕上
 void weaterData(String *cityDZ, String *dataSK, String *dataFC)
 {
-  //解析第一段JSON
+  // 解析第一段JSON
   DynamicJsonDocument doc(1024);
   deserializeJson(doc, *dataSK);
   JsonObject sk = doc.as<JsonObject>();
@@ -856,7 +854,7 @@ void weaterData(String *cityDZ, String *dataSK, String *dataFC)
   clk.setColorDepth(8);
   clk.loadFont(ZdyLwFont_20);
 
-  //温度
+  // 温度
   clk.createSprite(58, 24);
   clk.fillSprite(bgColor);
   clk.setTextDatum(CC_DATUM);
@@ -883,7 +881,7 @@ void weaterData(String *cityDZ, String *dataSK, String *dataFC)
   }
   tempWin();
 
-  //湿度
+  // 湿度
   clk.createSprite(58, 24);
   clk.fillSprite(bgColor);
   clk.setTextDatum(CC_DATUM);
@@ -907,7 +905,7 @@ void weaterData(String *cityDZ, String *dataSK, String *dataFC)
     humicol = 0xF00F;
   humidityWin();
 
-  //城市名称
+  // 城市名称
   clk.createSprite(94, 30);
   clk.fillSprite(bgColor);
   clk.setTextDatum(CC_DATUM);
