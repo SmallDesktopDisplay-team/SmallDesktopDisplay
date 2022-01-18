@@ -3,7 +3,7 @@
 // #include <TJpg_Decoder.h>
 
 #if Animate_Choice != 0
-int Animate_key = 0; //记录图标显示帧数
+int Animate_key = -1; //初始化图标显示帧数
 #endif
 
 #if Animate_Choice == 1
@@ -14,23 +14,21 @@ int Animate_key = 0; //记录图标显示帧数
 
 void imgAnim(const uint8_t **Animate_value, uint32_t *Animate_size)
 {
+#if Animate_Choice != 0
+    Animate_key++;
+#endif
 
-    if (Animate_key <= 10)
-    {
-        Animate_key++;
-    }
-    else
-    {
-        Animate_key = 0;
-    }
 //太空人起飞
 #if Animate_Choice == 1
     *Animate_value = astronaut[Animate_key];
     *Animate_size = astronaut[Animate_key];
+    if (Animate_key >= 9)
+        Animate_key = -1;
 //胡桃摇
 #elif Animate_Choice == 2
     *Animate_value = hutao[Animate_key];
     *Animate_size = hutao_size[Animate_key];
-}
-
+    if (Animate_key >= 31)
+        Animate_key = -1;
 #endif
+}
