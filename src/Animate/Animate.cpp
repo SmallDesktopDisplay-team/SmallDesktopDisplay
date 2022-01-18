@@ -1,6 +1,5 @@
 #include "Animate.h"
 #include "config.h"
-// #include <TJpg_Decoder.h>
 
 #if Animate_Choice != 0
 int Animate_key = -1; //初始化图标显示帧数
