@@ -12,10 +12,10 @@
  *
  *
  * 引 脚 分 配：SCK   GPIO14
- *             MOSI  GPIO13
- *             RES   GPIO2
- *             DC    GPIO0
- *             LCDBL GPIO5
+ *              MOSI  GPIO13
+ *              RES   GPIO2
+ *              DC    GPIO0
+ *              LCDBL GPIO5
  *
  *             增加DHT11温湿度传感器，传感器接口为 GPIO 12
  *
@@ -40,7 +40,6 @@
 #include <StaticThreadController.h> //协程控制
 
 #include "config.h"                  //配置文件
-#include "number/number.h"           //数字字库
 #include "weatherNum/weatherNum.h"   //天气图库
 #include "Animate/Animate.h"         //动画模块
 #include "wifiReFlash/wifiReFlash.h" //WIFI功能模块
@@ -70,15 +69,16 @@ Button2 Button_sw1 = Button2(4);
 /* *****************************************************************
  *  字库、图片库
  * *****************************************************************/
-#include "font/ZdyLwFont_20.h" //字体库
-#include "img/temperature.h"   //温度图标
-#include "img/humidity.h"      //湿度图标
+#include "font/ZdyLwFont_20.h"  //字体库
+#include "font/timeClockFont.h" //字体库
+#include "img/temperature.h"    //温度图标
+#include "img/humidity.h"       //湿度图标
 
 //函数声明
 void sendNTPpacket(IPAddress &address); //向NTP服务器发送请求
 time_t getNtpTime();                    //从NTP获取时间
 
-void digitalClockDisplay(int reflash_en);
+// void digitalClockDisplay(int reflash_en);
 void printDigits(int digits);
 String num2str(int digits);
 void LCD_reflash();
@@ -119,7 +119,7 @@ struct config_type
 };
 //---------------修改此处""内的信息--------------------
 //如开启WEB配网则可不用设置这里的参数，前一个为wifi ssid，后一个为密码
-config_type wificonf = {{"HUAWEI-0G17LY"}, {"19990823"}};
+config_type wificonf = {{"WiFi名"}, {"密码"}};
 
 //天气更新时间  X 分钟
 unsigned int updateweater_time = 1;
@@ -151,7 +151,6 @@ time_t prevDisplay = 0;       //显示时间显示记录
 int Amimate_reflash_Time = 0; //更新时间记录
 
 /*** Component objects ***/
-Number dig;
 WeatherNum wrat;
 
 uint32_t targetTime = 0;
@@ -346,7 +345,6 @@ void Serial_set()
   String incomingByte = "";
   if (Serial.available() > 0)
   {
-
     while (Serial.available() > 0) //监测串口缓存，当有数据输入时，循环赋值给incomingByte
     {
       incomingByte += char(Serial.read()); //读取单个字符值，转换为字符，并按顺序一个个赋值给incomingByte
@@ -1000,34 +998,74 @@ void scrollBanner()
   //  }
 }
 
-unsigned char Hour_sign = 60;
-unsigned char Minute_sign = 60;
-unsigned char Second_sign = 60;
-// 时钟刷新,输入1强制刷新
+// 用快速线方法绘制数字
+void drawLineFont(uint32_t _x, uint32_t _y, uint32_t _num, uint32_t _size, uint32_t _color)
+{
+  uint32_t fontSize;
+  const LineAtom *fontOne;
+  // 小号(9*14)
+  if (_size == 1)
+  {
+    fontOne = smallLineFont[_num];
+    fontSize = smallLineFont_size[_num];
+    // 绘制前清理字体绘制区域
+    tft.fillRect(_x, _y, 9, 14, TFT_BLACK);
+  }
+  // 中号(18*30)
+  else if (_size == 2)
+  {
+    fontOne = middleLineFont[_num];
+    fontSize = middleLineFont_size[_num];
+    // 绘制前清理字体绘制区域
+    tft.fillRect(_x, _y, 18, 30, TFT_BLACK);
+  }
+  // 大号(36*90)
+  else if (_size == 3)
+  {
+    fontOne = largeLineFont[_num];
+    fontSize = largeLineFont_size[_num];
+    // 绘制前清理字体绘制区域
+    tft.fillRect(_x, _y, 36, 90, TFT_BLACK);
+  }
+  else
+    return;
+
+  for (uint32_t i = 0; i < fontSize; i++)
+  {
+    tft.drawFastHLine(fontOne[i].xValue + _x, fontOne[i].yValue + _y, fontOne[i].lValue, _color);
+  }
+}
+
+int Hour_sign = 60;
+int Minute_sign = 60;
+int Second_sign = 60;
+// 日期刷新
 void digitalClockDisplay(int reflash_en = 0)
 {
-  int now_hour = hour();   //获取小时
-  int now_minu = minute(); //获取分钟
-  int now_seco = second(); //获取秒针
-
-  int timey = 82;
-  if ((now_hour != Hour_sign) || (reflash_en == 1)) //时钟刷新
+  // 时钟刷新,输入1强制刷新
+  int now_hour = hour();     //获取小时
+  int now_minute = minute(); //获取分钟
+  int now_second = second(); //获取秒针
+  //小时刷新
+  if ((now_hour != Hour_sign) || (reflash_en == 1))
   {
-    dig.printfW3660(20, timey, now_hour / 10);
-    dig.printfW3660(60, timey, now_hour % 10);
+    drawLineFont(20, timeY, now_hour / 10, 3, SD_FONT_WHITE);
+    drawLineFont(60, timeY, now_hour % 10, 3, SD_FONT_WHITE);
     Hour_sign = now_hour;
   }
-  if ((now_minu != Minute_sign) || (reflash_en == 1)) //分钟刷新
+  //分钟刷新
+  if ((now_minute != Minute_sign) || (reflash_en == 1))
   {
-    dig.printfO3660(101, timey, now_minu / 10);
-    dig.printfO3660(141, timey, now_minu % 10);
-    Minute_sign = now_minu;
+    drawLineFont(101, timeY, now_minute / 10, 3, SD_FONT_YELLOW);
+    drawLineFont(141, timeY, now_minute % 10, 3, SD_FONT_YELLOW);
+    Minute_sign = now_minute;
   }
-  if ((now_seco != Second_sign) || (reflash_en == 1)) //分钟刷新
+  //秒针刷新
+  if ((now_second != Second_sign) || (reflash_en == 1)) //分钟刷新
   {
-    dig.printfW1830(182, timey + 30, now_seco / 10);
-    dig.printfW1830(202, timey + 30, now_seco % 10);
-    Second_sign = now_seco;
+    drawLineFont(182, timeY + 30, now_second / 10, 2, SD_FONT_WHITE);
+    drawLineFont(202, timeY + 30, now_second % 10, 2, SD_FONT_WHITE);
+    Second_sign = now_second;
   }
 
   if (reflash_en == 1)
@@ -1139,7 +1177,8 @@ void wifi_reset(Button2 &btn)
 void reflashTime()
 {
   prevDisplay = now();
-  digitalClockDisplay(1);
+  // timeClockDisplay(1);
+  digitalClockDisplay();
   prevTime = 0;
 }
 
@@ -1332,7 +1371,6 @@ void setup()
 
   reflash_Animate.setInterval(TMS / 10); //设置帧率
   reflash_openWifi.onRun(refresh_AnimatedImage);
-
   controller.run();
 }
 
